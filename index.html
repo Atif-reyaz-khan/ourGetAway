@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Bangalore Days • Shagufta & Me</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cormorant Garamond for Serifs, Plus Jakarta Sans for Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        burgundy: '#4A0E17',
+                        deepBurgundy: '#2C060B',
+                        velvetRose: '#8C2535',
+                        roseGold: '#E6A594',
+                        softBlush: '#FBE8E5',
+                        champagne: '#F8F1E5',
+                        warmCandle: '#FFF4E0',
+                        dustyRose: '#C97C82'
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'candle-glow': '0 0 35px rgba(230, 165, 148, 0.3), 0 0 15px rgba(140, 37, 53, 0.2)',
+                        'romantic-card': '0 15px 35px -10px rgba(74, 14, 23, 0.15)',
+                        'inner-glow': 'inset 0 0 20px rgba(230, 165, 148, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #2C060B;
+            color: #F8F1E5;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Floating Canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Candle Flame Flicker Animation */
+        @keyframes candleFlicker {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.08) translateY(-2px); }
+            75% { opacity: 0.9; transform: scale(0.95); }
+        }
+
+        .candle-flame {
+            animation: candleFlicker 2.5s infinite ease-in-out;
+        }
+
+        /* Romantic Gradient Text */
+        .gradient-text-romantic {
+            background: linear-gradient(135deg, #FFF4E0 0%, #E6A594 50%, #C97C82 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Glassmorphism Romantic Card */
+        .glass-romantic {
+            background: rgba(74, 14, 23, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(230, 165, 148, 0.2);
+        }
+
+        .glass-romantic-light {
+            background: rgba(248, 241, 229, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(230, 165, 148, 0.3);
+            color: #2C060B;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2C060B;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8C2535;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E6A594;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen antialiased selection:bg-velvetRose selection:text-champagne">
+
+    <!-- Ambient Particle Canvas (Hearts & Sparkles) -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- FLOATING NAVIGATION BAR -->
+    <nav class="fixed top-0 left-0 right-0 z-40 bg-deepBurgundy/80 backdrop-blur-md border-b border-roseGold/20 transition-all duration-300 px-4 py-3.5">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <a href="#" class="font-serif text-2xl md:text-3xl font-bold tracking-tight text-champagne flex items-center gap-2.5">
+                <i class="fa-solid fa-heart text-roseGold text-lg animate-pulse"></i>
+                <span class="gradient-text-romantic font-serif italic">Shagufta & Me</span>
+            </a>
+            
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center space-x-8 text-xs font-semibold uppercase tracking-widest text-roseGold/80">
+                <a href="#itinerary" class="hover:text-champagne transition-colors">Our Days</a>
+                <a href="#journal" class="hover:text-champagne transition-colors">Memory Book</a>
+                <a href="#love-notes" class="hover:text-champagne transition-colors">Love Notes</a>
+                <a href="#checklist" class="hover:text-champagne transition-colors">Preparations</a>
+            </div>
+
+            <!-- Audio & Checklist Buttons -->
+            <div class="hidden md:flex items-center gap-3">
+                <button id="musicToggle" onclick="toggleAudio()" class="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium text-champagne bg-burgundy/80 border border-roseGold/30 rounded-full hover:border-roseGold transition-all">
+                    <i id="musicIcon" class="fa-solid fa-music text-roseGold"></i>
+                    <span id="musicText">Romantic Melody</span>
+                </button>
+
+                <button onclick="toggleChecklistModal()" class="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-deepBurgundy bg-roseGold hover:bg-champagne rounded-full shadow-candle-glow transition-all">
+                    <i class="fa-solid fa-sparkles"></i> Prep Checklist
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button onclick="toggleMobileMenu()" class="md:hidden text-roseGold text-xl p-2">
+                <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-roseGold/20 mt-3 pt-3 pb-2 flex flex-col space-y-3 px-2">
+            <a href="#itinerary" onclick="toggleMobileMenu()" class="text-sm text-champagne hover:text-roseGold py-1">Our Days</a>
+            <a href="#journal" onclick="toggleMobileMenu()" class="text-sm text-champagne hover:text-roseGold py-1">Memory Book</a>
+            <a href="#love-notes" onclick="toggleMobileMenu()" class="text-sm text-champagne hover:text-roseGold py-1">Love Notes</a>
+            <a href="#checklist" onclick="toggleMobileMenu()" class="text-sm text-champagne hover:text-roseGold py-1">Preparations</a>
+            <div class="flex flex-col gap-2 pt-2">
+                <button onclick="toggleAudio()" class="w-full justify-center inline-flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-champagne bg-burgundy/80 border border-roseGold/30 rounded-full">
+                    <i id="mobileMusicIcon" class="fa-solid fa-music text-roseGold"></i>
+                    <span>Toggle Romantic Melody</span>
+                </button>
+                <button onclick="toggleMobileMenu(); toggleChecklistModal()" class="w-full justify-center inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase text-deepBurgundy bg-roseGold rounded-full">
+                    <i class="fa-solid fa-sparkles"></i> Prep Checklist
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="relative z-10 pt-20">
+
+        <!-- 1. HERO SECTION -->
+        <section class="min-h-[90vh] flex flex-col items-center justify-center text-center px-4 py-20 relative overflow-hidden">
+            <!-- Glow background spheres -->
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-velvetRose/20 rounded-full blur-[120px] pointer-events-none"></div>
+
+            <div class="max-w-3xl mx-auto space-y-6 relative z-10">
+                
+                <!-- Candle Flame Graphic -->
+                <div class="flex justify-center mb-2">
+                    <div class="relative flex flex-col items-center">
+                        <div class="w-3 h-6 bg-gradient-to-t from-orange-500 via-yellow-300 to-white rounded-full candle-flame shadow-candle-glow"></div>
+                        <div class="w-6 h-1.5 bg-roseGold/30 rounded-full blur-xs mt-1"></div>
+                    </div>
+                </div>
+
+                <!-- Romantic Tagline Badge -->
+                <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-burgundy/80 border border-roseGold/40 text-roseGold text-xs font-semibold uppercase tracking-widest shadow-candle-glow">
+                    <i class="fa-solid fa-heart text-velvetRose"></i> 5–15 November 2026 • Bengaluru
+                </div>
+
+                <!-- Main Heading -->
+                <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-champagne leading-tight">
+                    Our Bangalore Days
+                </h1>
+                
+                <p class="font-serif italic text-3xl md:text-4xl text-roseGold max-w-2xl mx-auto font-light">
+                    Every moment curated for Shagufta
+                </p>
+
+                <div class="w-24 h-0.5 bg-gradient-to-r from-transparent via-roseGold to-transparent mx-auto my-6"></div>
+
+                <!-- Quote Box -->
+                <blockquote class="text-champagne/90 font-serif italic text-xl md:text-2xl max-w-xl mx-auto glass-romantic p-6 rounded-3xl border border-roseGold/30 shadow-candle-glow leading-relaxed">
+                    “Some days are planned, some become memories.<br class="hidden md:inline"> Let's leave room for both.”
+                </blockquote>
+
+                <!-- ROMANTIC COUNTDOWN TIMER -->
+                <div class="pt-8">
+                    <p class="text-xs uppercase tracking-widest text-roseGold/80 font-bold mb-4">Until Shagufta Arrives in My Arms</p>
+                    <div id="countdown" class="grid grid-cols-4 gap-3 md:gap-4 max-w-md mx-auto">
+                        <div class="glass-romantic p-3.5 rounded-2xl border border-roseGold/30 text-center shadow-candle-glow">
+                            <span id="cd-days" class="block font-serif text-3xl md:text-4xl font-bold text-champagne">--</span>
+                            <span class="text-[10px] uppercase font-bold text-roseGold tracking-widest">Days</span>
+                        </div>
+                        <div class="glass-romantic p-3.5 rounded-2xl border border-roseGold/30 text-center shadow-candle-glow">
+                            <span id="cd-hours" class="block font-serif text-3xl md:text-4xl font-bold text-champagne">--</span>
+                            <span class="text-[10px] uppercase font-bold text-roseGold tracking-widest">Hours</span>
+                        </div>
+                        <div class="glass-romantic p-3.5 rounded-2xl border border-roseGold/30 text-center shadow-candle-glow">
+                            <span id="cd-minutes" class="block font-serif text-3xl md:text-4xl font-bold text-champagne">--</span>
+                            <span class="text-[10px] uppercase font-bold text-roseGold tracking-widest">Mins</span>
+                        </div>
+                        <div class="glass-romantic p-3.5 rounded-2xl border border-roseGold/30 text-center shadow-candle-glow">
+                            <span id="cd-seconds" class="block font-serif text-3xl md:text-4xl font-bold text-champagne">--</span>
+                            <span class="text-[10px] uppercase font-bold text-roseGold tracking-widest">Secs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call to action -->
+                <div class="pt-8">
+                    <a href="#itinerary" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-velvetRose to-burgundy hover:from-roseGold hover:to-velvetRose text-champagne hover:text-deepBurgundy text-sm font-semibold uppercase tracking-wider rounded-full shadow-candle-glow transition-all duration-300 hover:scale-105 group border border-roseGold/40">
+                        Explore Our Romantic Itinerary
+                        <i class="fa-solid fa-heart group-hover:scale-125 transition-transform text-roseGold group-hover:text-deepBurgundy"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 2. DAY-BY-DAY ROMANTIC ITINERARY SECTION -->
+        <section id="itinerary" class="max-w-6xl mx-auto px-4 py-20">
+            <div class="text-center space-y-3 mb-12">
+                <span class="text-xs uppercase font-bold tracking-widest text-roseGold">Our 11 Days of Love</span>
+                <h2 class="font-serif text-4xl md:text-6xl font-bold text-champagne">Day-by-Day Itinerary</h2>
+                <p class="text-champagne/70 text-sm md:text-base max-w-lg mx-auto font-light">
+                    Balancing quiet weekday evenings after work with romantic weekend adventures.
+                </p>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="flex justify-center gap-3 mb-12 flex-wrap">
+                <button onclick="filterItinerary('all')" id="btn-all" class="filter-btn active-tab px-6 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border border-roseGold transition-all bg-roseGold text-deepBurgundy shadow-candle-glow">
+                    All 11 Days
+                </button>
+                <button onclick="filterItinerary('weekday')" id="btn-weekday" class="filter-btn px-6 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border border-roseGold/30 glass-romantic text-champagne hover:border-roseGold transition-all">
+                    <i class="fa-regular fa-moon mr-1.5 text-roseGold"></i> Weekday Evenings
+                </button>
+                <button onclick="filterItinerary('weekend')" id="btn-weekend" class="filter-btn px-6 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border border-roseGold/30 glass-romantic text-champagne hover:border-roseGold transition-all">
+                    <i class="fa-regular fa-sun mr-1.5 text-roseGold"></i> Weekend Escapes
+                </button>
+            </div>
+
+            <!-- ITINERARY GRID -->
+            <div id="itinerary-grid" class="grid md:grid-cols-2 gap-8">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+
+        <!-- 3. ROMANTIC LOVE NOTES & SPECIAL TOUCHES -->
+        <section id="love-notes" class="bg-burgundy/40 border-y border-roseGold/20 py-24 px-4 relative overflow-hidden">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center space-y-3 mb-16">
+                    <span class="text-xs uppercase font-bold tracking-widest text-roseGold">Thoughtful Surprises</span>
+                    <h2 class="font-serif text-4xl md:text-6xl font-bold text-champagne">Romantic Touchpoints</h2>
+                    <p class="text-champagne/70 text-sm max-w-md mx-auto">Small details designed to make Shagufta feel cherished continuously.</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Surprise 1 -->
+                    <div class="glass-romantic p-8 rounded-3xl border border-roseGold/30 shadow-candle-glow flex flex-col justify-between hover:border-roseGold transition-all group">
+                        <div>
+                            <div class="w-14 h-14 rounded-2xl bg-velvetRose/50 border border-roseGold/40 text-roseGold flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-hands-holding-circle"></i>
+                            </div>
+                            <h3 class="font-serif text-2xl font-bold text-champagne mb-3">Shared Clay Keepsake</h3>
+                            <p class="text-champagne/80 text-sm leading-relaxed font-light">
+                                During our Saturday pottery session, we will press our initials into a small handmade clay vessel that will live forever on our bedside table.
+                            </p>
+                        </div>
+                        <div class="mt-8 pt-4 border-t border-roseGold/20 flex items-center justify-between text-xs font-semibold text-roseGold">
+                            <span>Saturday, 7 November</span>
+                            <i class="fa-solid fa-heart text-velvetRose"></i>
+                        </div>
+                    </div>
+
+                    <!-- Surprise 2 -->
+                    <div class="glass-romantic p-8 rounded-3xl border border-roseGold/30 shadow-candle-glow flex flex-col justify-between hover:border-roseGold transition-all group">
+                        <div>
+                            <div class="w-14 h-14 rounded-2xl bg-velvetRose/50 border border-roseGold/40 text-roseGold flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-envelope-open-text"></i>
+                            </div>
+                            <h3 class="font-serif text-2xl font-bold text-champagne mb-3">Sealed Love Letters</h3>
+                            <p class="text-champagne/80 text-sm leading-relaxed font-light">
+                                For our Friday special candlelight dinner, we each arrive with a handwritten letter sealed in wax, exchanging them before dessert.
+                            </p>
+                        </div>
+                        <div class="mt-8 pt-4 border-t border-roseGold/20 flex items-center justify-between text-xs font-semibold text-roseGold">
+                            <span>Friday, 13 November</span>
+                            <i class="fa-solid fa-heart text-velvetRose"></i>
+                        </div>
+                    </div>
+
+                    <!-- Surprise 3 -->
+                    <div class="glass-romantic p-8 rounded-3xl border border-roseGold/30 shadow-candle-glow flex flex-col justify-between hover:border-roseGold transition-all group">
+                        <div>
+                            <div class="w-14 h-14 rounded-2xl bg-velvetRose/50 border border-roseGold/40 text-roseGold flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-feather-pointed"></i>
+                            </div>
+                            <h3 class="font-serif text-2xl font-bold text-champagne mb-3">20-Minute Poetry Reading</h3>
+                            <p class="text-champagne/80 text-sm leading-relaxed font-light">
+                                At our cozy Tuesday café date, we dedicate 20 minutes to silent writing, then read out short poems written specifically for each other.
+                            </p>
+                        </div>
+                        <div class="mt-8 pt-4 border-t border-roseGold/20 flex items-center justify-between text-xs font-semibold text-roseGold">
+                            <span>Tuesday, 10 November</span>
+                            <i class="fa-solid fa-heart text-velvetRose"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Secret Love Note Drawer -->
+                <div class="mt-16 text-center">
+                    <button onclick="openRandomLoveNote()" class="inline-flex items-center gap-3 px-8 py-3.5 bg-burgundy hover:bg-velvetRose text-champagne font-serif text-lg italic rounded-full border border-roseGold/40 shadow-candle-glow transition-all hover:scale-105">
+                        <i class="fa-solid fa-envelope-heart text-roseGold"></i> Unlock a Secret Love Note for Shagufta
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 4. KEEPSAKE JOURNAL (10 DAYS, 10 MEMORIES) -->
+        <section id="journal" class="max-w-6xl mx-auto px-4 py-24">
+            <div class="text-center space-y-3 mb-16">
+                <span class="text-xs uppercase font-bold tracking-widest text-roseGold">Our Physical Keepsake</span>
+                <h2 class="font-serif text-4xl md:text-6xl font-bold text-champagne">“10 Days, 10 Memories” Journal</h2>
+                <p class="text-champagne/70 text-sm max-w-lg mx-auto font-light">
+                    Every single day, we record one photo, one favorite moment, and one line of poetry in a custom notebook given as a keepsake on departure day.
+                </p>
+            </div>
+
+            <!-- JOURNAL BOOK INTERACTIVE DISPLAY -->
+            <div class="glass-romantic border border-roseGold/40 rounded-3xl p-8 md:p-12 shadow-candle-glow max-w-4xl mx-auto relative">
+                <div class="flex items-center justify-between border-b border-roseGold/20 pb-6 mb-8">
+                    <div>
+                        <span class="text-xs uppercase font-bold tracking-widest text-roseGold">Journal Entry Preview</span>
+                        <h3 id="journal-day-title" class="font-serif text-3xl md:text-4xl font-bold text-champagne mt-1">Day 1: Thu, 5 Nov</h3>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="prevJournalDay()" class="w-10 h-10 rounded-full bg-burgundy hover:bg-velvetRose border border-roseGold/30 text-roseGold flex items-center justify-center transition-colors shadow-sm">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <span id="journal-index" class="text-xs font-bold text-roseGold px-2">1 / 10</span>
+                        <button onclick="nextJournalDay()" class="w-10 h-10 rounded-full bg-burgundy hover:bg-velvetRose border border-roseGold/30 text-roseGold flex items-center justify-center transition-colors shadow-sm">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-10 items-center">
+                    <!-- Photo Display / Visual Placeholder -->
+                    <div class="relative group">
+                        <div class="w-full h-72 rounded-2xl bg-deepBurgundy border-2 border-dashed border-roseGold/40 flex flex-col items-center justify-center text-center p-6 transition-all shadow-inner-glow">
+                            <i id="journal-icon" class="fa-solid fa-heart text-4xl text-roseGold mb-3"></i>
+                            <span id="journal-photo-label" class="font-serif text-xl font-bold text-champagne">Arrival & Welcome Snap</span>
+                            <span class="text-xs text-roseGold/70 mt-2 font-light">Printed photograph to be glued on Nov 5</span>
+                        </div>
+                    </div>
+
+                    <!-- Journal Text Content -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="text-[11px] font-bold uppercase tracking-widest text-roseGold flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-heart text-velvetRose"></i> Favorite Moment
+                            </label>
+                            <p id="journal-moment" class="text-champagne text-base italic font-light leading-relaxed bg-burgundy/40 p-4 rounded-xl border border-roseGold/20">
+                                "Seeing Shagufta at the arrival gate after waiting all week."
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="text-[11px] font-bold uppercase tracking-widest text-roseGold flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-quote-left text-velvetRose"></i> Line of Poetry / Thought
+                            </label>
+                            <p id="journal-poem" class="font-serif italic text-2xl text-champagne font-normal leading-snug">
+                                “And so the long-awaited days begin, quietly and softly.”
+                            </p>
+                        </div>
+
+                        <div class="pt-2 flex justify-between items-center">
+                            <button onclick="editJournalEntryModal()" class="text-xs font-semibold text-roseGold hover:text-champagne transition-colors underline underline-offset-4 flex items-center gap-1.5">
+                                <i class="fa-regular fa-pen-to-square"></i> Customize Note Preview
+                            </button>
+                            <span class="text-[10px] text-champagne/40 uppercase tracking-widest">Page Kept Forever</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 5. PRACTICAL PREPARATIONS CHECKLIST -->
+        <section id="checklist" class="max-w-6xl mx-auto px-4 py-20 mb-16">
+            <div class="glass-romantic border border-roseGold/30 rounded-3xl p-8 md:p-12 shadow-candle-glow">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 border-b border-roseGold/20 pb-6">
+                    <div>
+                        <span class="text-xs uppercase font-bold tracking-widest text-roseGold">Pre-Flight Checks</span>
+                        <h2 class="font-serif text-3xl md:text-5xl font-bold text-champagne">Preparations Checklist</h2>
+                        <p class="text-champagne/70 text-sm mt-1">Ensuring every detail is seamlessly arranged before Shagufta lands.</p>
+                    </div>
+                    <button onclick="resetChecklist()" class="text-xs font-bold uppercase tracking-wider text-deepBurgundy bg-roseGold px-5 py-2.5 rounded-full hover:bg-champagne transition-all shadow-candle-glow self-start md:self-auto">
+                        <i class="fa-solid fa-rotate-left mr-1.5"></i> Reset Tasks
+                    </button>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-5" id="checklist-items-container">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-roseGold/20 py-12 bg-deepBurgundy text-center text-xs text-roseGold/70 relative z-10">
+        <div class="max-w-5xl mx-auto px-4 space-y-4">
+            <div class="flex justify-center items-center gap-2 text-roseGold text-lg">
+                <i class="fa-solid fa-heart"></i>
+                <i class="fa-solid fa-sparkles"></i>
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <p class="font-serif text-xl font-bold text-champagne">
+                OUR BANGALORE DAYS • 5–15 NOVEMBER 2026
+            </p>
+            <p class="italic font-serif text-base text-roseGold">
+                "Some days are planned, some become memories. Let's leave room for both."
+            </p>
+            <p class="text-[11px] text-champagne/40 tracking-widest uppercase">Created with boundless love for Shagufta</p>
+        </div>
+    </footer>
+
+
+    <!-- MODAL: DAY DETAILS -->
+    <div id="dayModal" class="fixed inset-0 z-50 bg-deepBurgundy/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-romantic-light rounded-3xl max-w-lg w-full p-8 shadow-2xl relative border border-roseGold/40 animate-in fade-in zoom-in duration-200">
+            <button onclick="closeDayModal()" class="absolute top-6 right-6 text-slate-400 hover:text-deepBurgundy w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div id="modal-content">
+                <!-- Dynamically filled -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL: RANDOM LOVE NOTE SURPRISE -->
+    <div id="loveNoteModal" class="fixed inset-0 z-50 bg-deepBurgundy/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-romantic rounded-3xl max-w-md w-full p-8 shadow-candle-glow relative border border-roseGold/50 text-center">
+            <button onclick="closeLoveNoteModal()" class="absolute top-5 right-5 text-roseGold hover:text-champagne">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="w-16 h-16 rounded-full bg-velvetRose/60 text-roseGold mx-auto flex items-center justify-center text-3xl mb-4 border border-roseGold/30">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+            <span class="text-xs uppercase font-bold tracking-widest text-roseGold">Note for Shagufta</span>
+            <p id="love-note-text" class="font-serif italic text-2xl text-champagne my-6 leading-relaxed font-normal">
+                "In your laughter, I found my favorite place in Bengaluru."
+            </p>
+            <button onclick="closeLoveNoteModal()" class="px-6 py-2.5 bg-roseGold text-deepBurgundy font-bold text-xs uppercase tracking-wider rounded-full hover:bg-champagne transition-colors">
+                Keep Close to Heart
+            </button>
+        </div>
+    </div>
+
+
+    <!-- MODAL: PREP CHECKLIST DRAWER -->
+    <div id="checklistModal" class="fixed inset-0 z-50 bg-deepBurgundy/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-romantic rounded-3xl max-w-xl w-full p-8 shadow-candle-glow relative max-h-[90vh] overflow-y-auto border border-roseGold/40">
+            <button onclick="toggleChecklistModal()" class="absolute top-6 right-6 text-roseGold hover:text-champagne">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="font-serif text-3xl font-bold text-champagne mb-1">Pre-Trip Checklist & Verification</h3>
+            <p class="text-xs text-roseGold mb-6">Practical verification details before arrival.</p>
+            <div class="space-y-4 text-sm" id="modal-checklist-content">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL: EDIT JOURNAL NOTE -->
+    <div id="editJournalModal" class="fixed inset-0 z-50 bg-deepBurgundy/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-romantic-light rounded-3xl max-w-md w-full p-8 shadow-2xl relative border border-roseGold/40">
+            <button onclick="closeEditJournalModal()" class="absolute top-5 right-5 text-slate-400 hover:text-deepBurgundy">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="font-serif text-2xl font-bold text-deepBurgundy mb-4">Edit Memory Preview</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-velvetRose mb-1">Favorite Moment</label>
+                    <input type="text" id="edit-moment-input" class="w-full px-4 py-2.5 text-sm bg-white border border-roseGold/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-velvetRose text-deepBurgundy">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-velvetRose mb-1">Line of Poetry / Thought</label>
+                    <textarea id="edit-poem-input" rows="3" class="w-full px-4 py-2.5 text-sm bg-white border border-roseGold/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-velvetRose text-deepBurgundy"></textarea>
+                </div>
+                <button onclick="saveJournalNote()" class="w-full py-3 bg-velvetRose text-champagne font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-deepBurgundy transition-colors shadow-md">
+                    Save Keepsake Note
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        // --- 1. FULL ITINERARY DATA (BANGALORE 5-15 NOV 2026) ---
+        const itineraryData = [
+            {
+                id: 1,
+                date: "Thu, 5 Nov",
+                dayType: "weekday",
+                title: "Welcome to Bangalore",
+                time: "Arrival Day",
+                location: "Kempegowda Airport / Cozy Home",
+                category: "Arrival & Settle In",
+                summary: "Airport pickup, warm embrace, relaxed home dinner, and unhurried time together.",
+                details: "Keep this day completely flexible around Shagufta's arrival time. Settle in, make hot chai or order comfort food, and spend a cozy evening catching up after time apart.",
+                icon: "fa-plane-arrival",
+                tag: "Arrival Night"
+            },
+            {
+                id: 2,
+                date: "Fri, 6 Nov",
+                dayType: "weekday",
+                title: "Church Street Stroll",
+                time: "6:30 – 9:30 PM",
+                location: "Church Street & MG Road",
+                category: "Bookstores & Dessert",
+                summary: "Browse cozy bookstores hand-in-hand, enjoy coffee, dessert, and pick a book or poem for each other.",
+                details: "Stroll through Blossom Book House or Higginbothams. Secretly pick a special book for each other, followed by warm dessert & coffee at an aesthetic café.",
+                icon: "fa-book-open",
+                tag: "Bookstore Date"
+            },
+            {
+                id: 3,
+                date: "Sat, 7 Nov",
+                dayType: "weekend",
+                title: "Pottery Workshop + Evening Open Mic",
+                time: "Late Morning & Optional Evening",
+                location: "Clay Studio / Indiranagar",
+                category: "Hands-on Workshop",
+                summary: "Late-morning pottery session shaping clay together, leisurely lunch, and optional evening open mic.",
+                details: "Get clay on our hands while shaping a small ceramic bowl or vase as a keepsake. Have a relaxed lunch afterwards. Optional evening poetry open mic if energy permits.",
+                icon: "fa-hands-holding-circle",
+                tag: "Pottery & Clay"
+            },
+            {
+                id: 4,
+                date: "Sun, 8 Nov",
+                dayType: "weekend",
+                title: "Nandi Hills Sunrise Drive",
+                time: "4:30 AM Start",
+                location: "Nandi Hills Top",
+                category: "Sunrise Drive",
+                summary: "Early morning drive through misty roads, sunrise views above clouds, breakfast, and a free rest evening.",
+                details: "Depart at 4:30 AM in the crisp morning air. Watch the golden sunrise over misty hilltops with warm tea in hand. Return early afternoon; evening left completely open for restful sleep.",
+                icon: "fa-mountain-sun",
+                tag: "Sunrise Drive"
+            },
+            {
+                id: 5,
+                date: "Mon, 9 Nov",
+                dayType: "weekday",
+                title: "Ulsoor Lake Evening Walk",
+                time: "6:30 – 9:00 PM",
+                location: "Ulsoor Lake & Café",
+                category: "Lakeside Sunset Walk",
+                summary: "A gentle twilight walk by Ulsoor lake and a quiet nearby dinner.",
+                details: "Unwind after work with a calm walk along the lakeside breeze, watching the evening reflections on the water, followed by dinner at a quiet nearby bistro.",
+                icon: "fa-water",
+                tag: "Lakeside Stroll"
+            },
+            {
+                id: 6,
+                date: "Tue, 10 Nov",
+                dayType: "weekday",
+                title: "Café & Poetry Evening",
+                time: "7:00 – 9:00 PM",
+                location: "Peaceful Candlelit Café",
+                category: "Poetry Reading",
+                summary: "A deliberately light evening: quiet café, warm drinks, 20 minutes of writing, and reading poetry to each other.",
+                details: "Arrive at a quiet cafe at 7:00 PM. Order hot coffee and pastries, spend 20 minutes writing down thoughts or lines for each other, read them aloud softly, and head home by 8:30 PM.",
+                icon: "fa-feather-pointed",
+                tag: "Poetry Night"
+            },
+            {
+                id: 7,
+                date: "Wed, 11 Nov",
+                dayType: "weekday",
+                title: "Cosy Night In",
+                time: "7:00 – 9:30 PM",
+                location: "Home",
+                category: "Home & Scrapbook",
+                summary: "Cook together or order favorite food, watch a romantic film, play chess, and update the memory journal.",
+                details: "Stay in comfortable loungewear. Prepare a meal together or order from a favorite spot, play chess or watch a film, and add photos/notes into the physical 10-day journal.",
+                icon: "fa-house-chimney-heart",
+                tag: "Cozy Home Date"
+            },
+            {
+                id: 8,
+                date: "Thu, 12 Nov",
+                dayType: "weekday",
+                title: "Theatre Date at Ranga Shankara",
+                time: "6:30 – 9:30 PM",
+                location: "Ranga Shankara, Jayanagar",
+                category: "Stage & Dinner",
+                summary: "Watch a live play performance followed by authentic South Bangalore dinner.",
+                details: "Immerse in live theatre art at Ranga Shankara (conditional on play schedule), followed by a warm dinner date in Jayanagar/JP Nagar.",
+                icon: "fa-masks-theater",
+                tag: "Theatre Date"
+            },
+            {
+                id: 9,
+                date: "Fri, 13 Nov",
+                dayType: "weekday",
+                title: "Candlelight Special Dinner",
+                time: "7:00 – 10:00 PM",
+                location: "Romantic Fine Dining",
+                category: "Letter Exchange Dinner",
+                summary: "Dress up, exchange sealed handwritten letters, take photos, and celebrate our time together.",
+                details: "Pick an elegant restaurant, dress up for each other, exchange handwritten letters across candlelight, take photos, and conclude with delicious dessert.",
+                icon: "fa-wine-glass",
+                tag: "Candlelight Dinner"
+            },
+            {
+                id: 10,
+                date: "Sat, 14 Nov",
+                dayType: "weekend",
+                title: "Cubbon Park & Art Museum Day",
+                time: "Morning to Afternoon",
+                location: "Cubbon Park & MAP Museum",
+                category: "Park & Gallery",
+                summary: "Breakfast, morning walk in Cubbon Park, visit Museum of Art & Photography (MAP).",
+                details: "Enjoy morning sunlight under the bamboo trees of Cubbon Park, followed by a lush breakfast. Spend the afternoon exploring modern art exhibitions at MAP.",
+                icon: "fa-palette",
+                tag: "Park & Art"
+            },
+            {
+                id: 11,
+                date: "Sun, 15 Nov",
+                dayType: "weekend",
+                title: "One Last Slow Morning",
+                time: "Before Departure",
+                location: "Home / Airport Transfer",
+                category: "Departure Keepsake",
+                summary: "Leisurely breakfast, complete and hand over the 10-day keepsake journal, airport goodbye.",
+                details: "A lingering, sweet final breakfast. Seal the physical '10 Days, 10 Memories' journal and gift it to Shagufta as a permanent memory before heading to the airport with generous time buffers.",
+                icon: "fa-heart-circle-check",
+                tag: "Keepsake & Farewell"
+            }
+        ];
+
+        // --- 2. ROMANTIC LOVE NOTES POOL ---
+        const loveNotesPool = [
+            "“In your eyes, I found a home that Bengaluru's quietest cafés could never replace.”",
+            "“Every street on this itinerary is just an excuse to walk next to you.”",
+            "“Some people search for poetry in books; I just look at you.”",
+            "“If I could hold sunrise at Nandi Hills still for an extra hour, I'd spend it watching you smile.”",
+            "“Ten days together isn't enough, but I promise to make every second feel timeless.”",
+            "“Thank you for coming to my city and turning it into our paradise.”"
+        ];
+
+        // --- 3. JOURNAL ENTRIES ---
+        let journalEntries = [
+            { day: "Day 1: Thu, 5 Nov", title: "Arrival & Soft Hugs", moment: "Seeing Shagufta walk through the airport arrivals gate after weeks apart.", poem: "“And so the long-awaited days begin, quietly and softly.”", icon: "fa-plane-arrival" },
+            { day: "Day 2: Fri, 6 Nov", title: "Bookstore Stroll", moment: "Hiding a secret romantic handwritten note inside the book I picked for her.", poem: "“Words written by others that sound like our own story.”", icon: "fa-book-open" },
+            { day: "Day 3: Sat, 7 Nov", title: "Pottery & Clay", moment: "Getting wet clay on our hands while shaping our shared keepsake bowl.", poem: "“Molded by touch, held in gentle hands.”", icon: "fa-hands-holding-circle" },
+            { day: "Day 4: Sun, 8 Nov", title: "Misty Sunrise Drive", moment: "Wrapping a warm scarf around her while sipping tea at Nandi Hills peak.", poem: "“Before the sun wakes the world, we are already here.”", icon: "fa-sun" },
+            { day: "Day 5: Mon, 9 Nov", title: "Lakeside Twilight", moment: "Walking along Ulsoor lake as the evening lights reflected on the water.", poem: "“Evening falls like silk over quiet water.”", icon: "fa-water" },
+            { day: "Day 6: Tue, 10 Nov", title: "Candlelit Poetry", moment: "Listening to her read a 4-line poem written specifically for me.", poem: "“20 minutes of writing, a lifetime of meaning.”", icon: "fa-feather-pointed" },
+            { day: "Day 7: Wed, 11 Nov", title: "Home & Chess", moment: "Laughing out loud when she unexpectedly checkmated my king.", poem: "“Home is not a place, but a quiet evening together.”", icon: "fa-house-chimney-heart" },
+            { day: "Day 8: Thu, 12 Nov", title: "Theatre Whispers", moment: "Holding hands in the dark while the auditorium lights dimmed.", poem: "“Stories on stage, but the best story is right here.”", icon: "fa-masks-theater" },
+            { day: "Day 9: Fri, 13 Nov", title: "Wax-Sealed Letters", moment: "Watching her read my letter over dessert with a soft tear of joy.", poem: "“Ink on paper, warmth in heart.”", icon: "fa-envelope-open-text" },
+            { day: "Day 10: Sat, 14 Nov", title: "Cubbon Sunlight", moment: "Sitting under the bamboo trees sharing a pastry in the breeze.", poem: "“Filtered sunlight through green leaves, forever framed.”", icon: "fa-tree" }
+        ];
+
+        // --- 4. CHECKLIST ITEMS ---
+        let checklistItems = [
+            { id: 1, title: "Confirm Flight & Airport Pickups", desc: "Verify Shagufta's landing time on 5 Nov for comfortable airport pickup buffer.", completed: false },
+            { id: 2, title: "Book Saturday Pottery Slot", desc: "Confirm clay studio availability, timing, and deposit for Sat, 7 Nov.", completed: false },
+            { id: 3, title: "Check Nandi Hills Sunrise Pass", desc: "Verify Sunday 8 Nov morning access gate timing and hill road rules.", completed: true },
+            { id: 4, title: "Ranga Shankara Play Tickets", desc: "Check 12 Nov theatre schedule & reserve seats in advance.", completed: false },
+            { id: 5, title: "MAP Museum Entry Passes", desc: "Book Saturday 14 Nov museum gallery exhibition access.", completed: false },
+            { id: 6, title: "Buy Keepsake Journal & Wax Seal", desc: "Prepare a physical leather notebook & wax seal set for the letter exchange.", completed: true }
+        ];
+
+        let currentJournalIndex = 0;
+
+        // --- 5. FLOATING PARTICLES CANVAS SYSTEM ---
+        function initParticleCanvas() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const particles = [];
+            const count = 35;
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 12 + 6,
+                    speedY: Math.random() * 0.6 + 0.2,
+                    speedX: (Math.random() - 0.5) * 0.4,
+                    opacity: Math.random() * 0.5 + 0.2,
+                    type: Math.random() > 0.4 ? 'heart' : 'sparkle'
+                });
+            }
+
+            function drawHeart(x, y, size, opacity) {
+                ctx.save();
+                ctx.globalAlpha = opacity;
+                ctx.fillStyle = '#E6A594';
+                ctx.beginPath();
+                const topCurveHeight = size * 0.3;
+                ctx.moveTo(x, y + topCurveHeight);
+                ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + topCurveHeight);
+                ctx.bezierCurveTo(x - size / 2, y + (size + topCurveHeight) / 2, x, y + size, x, y + size);
+                ctx.bezierCurveTo(x, y + size, x + size / 2, y + (size + topCurveHeight) / 2, x + size / 2, y + topCurveHeight);
+                ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function drawSparkle(x, y, size, opacity) {
+                ctx.save();
+                ctx.globalAlpha = opacity;
+                ctx.fillStyle = '#FFF4E0';
+                ctx.beginPath();
+                ctx.arc(x, y, size / 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(p => {
+                    p.y -= p.speedY;
+                    p.x += p.speedX;
+
+                    if (p.y < -20) {
+                        p.y = canvas.height + 20;
+                        p.x = Math.random() * canvas.width;
+                    }
+
+                    if (p.type === 'heart') {
+                        drawHeart(p.x, p.y, p.size, p.opacity);
+                    } else {
+                        drawSparkle(p.x, p.y, p.size, p.opacity);
+                    }
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // --- 6. WEBAUDIO ROMANTIC SYNTHESIZER ---
+        let audioCtx = null;
+        let isAudioPlaying = false;
+        let audioInterval = null;
+
+        function toggleAudio() {
+            if (!isAudioPlaying) {
+                startRomanticMelody();
+            } else {
+                stopRomanticMelody();
+            }
+        }
+
+        function startRomanticMelody() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            isAudioPlaying = true;
+            document.getElementById('musicText').innerText = "Melody Playing...";
+            document.getElementById('musicIcon').className = "fa-solid fa-heart text-velvetRose animate-pulse";
+            if (document.getElementById('mobileMusicIcon')) {
+                document.getElementById('mobileMusicIcon').className = "fa-solid fa-heart text-velvetRose animate-pulse";
+            }
+
+            // Simple warm romantic pentatonic chord arpeggio
+            const notes = [261.63, 329.63, 392.00, 493.88, 523.25, 659.25]; // C, E, G, B, C, E
+            let index = 0;
+
+            audioInterval = setInterval(() => {
+                if (!isAudioPlaying) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(notes[index % notes.length], audioCtx.currentTime);
+
+                gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.4);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 2.6);
+
+                index = Math.floor(Math.random() * notes.length);
+            }, 1200);
+        }
+
+        function stopRomanticMelody() {
+            isAudioPlaying = false;
+            if (audioInterval) clearInterval(audioInterval);
+            document.getElementById('musicText').innerText = "Romantic Melody";
+            document.getElementById('musicIcon').className = "fa-solid fa-music text-roseGold";
+            if (document.getElementById('mobileMusicIcon')) {
+                document.getElementById('mobileMusicIcon').className = "fa-solid fa-music text-roseGold";
+            }
+        }
+
+        // --- 7. ITINERARY RENDERER ---
+        function renderItinerary(filter = 'all') {
+            const container = document.getElementById('itinerary-grid');
+            container.innerHTML = '';
+
+            const filtered = itineraryData.filter(item => {
+                if (filter === 'all') return true;
+                return item.dayType === filter;
+            });
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "glass-romantic rounded-3xl p-7 border border-roseGold/20 shadow-candle-glow flex flex-col justify-between hover:border-roseGold transition-all group relative overflow-hidden";
+                
+                card.innerHTML = `
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3.5 py-1 bg-burgundy/80 text-roseGold border border-roseGold/30 text-[11px] font-bold uppercase tracking-wider rounded-full">
+                                ${item.date}
+                            </span>
+                            <span class="text-xs font-medium text-roseGold flex items-center gap-1.5">
+                                <i class="fa-regular fa-clock"></i> ${item.time}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-velvetRose/40 border border-roseGold/30 text-roseGold flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid ${item.icon}"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-serif text-2xl font-bold text-champagne leading-tight mb-1">${item.title}</h3>
+                                <p class="text-xs text-roseGold/80"><i class="fa-solid fa-location-dot mr-1"></i>${item.location}</p>
+                            </div>
+                        </div>
+
+                        <p class="text-champagne/80 text-sm leading-relaxed mb-6 font-light">
+                            ${item.summary}
+                        </p>
+                    </div>
+
+                    <div class="relative z-10 pt-4 border-t border-roseGold/15 flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-widest text-roseGold/60">${item.tag}</span>
+                        <button onclick="openDayModal(${item.id})" class="text-xs font-semibold text-roseGold hover:text-champagne transition-colors flex items-center gap-1.5">
+                            View details <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterItinerary(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-roseGold', 'text-deepBurgundy', 'shadow-candle-glow');
+                btn.classList.add('glass-romantic', 'text-champagne');
+            });
+            
+            const activeBtn = document.getElementById(`btn-${type}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('glass-romantic', 'text-champagne');
+                activeBtn.classList.add('bg-roseGold', 'text-deepBurgundy', 'shadow-candle-glow');
+            }
+
+            renderItinerary(type);
+        }
+
+        // --- 8. MODAL CONTROLLERS ---
+        function openDayModal(id) {
+            const day = itineraryData.find(d => d.id === id);
+            if (!day) return;
+
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-velvetRose text-roseGold flex items-center justify-center text-2xl border border-roseGold/30">
+                        <i class="fa-solid ${day.icon}"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-velvetRose">${day.date} • ${day.time}</span>
+                        <h3 class="font-serif text-3xl font-bold text-deepBurgundy">${day.title}</h3>
+                    </div>
+                </div>
+
+                <div class="space-y-4 my-6 text-sm text-slate-700 leading-relaxed">
+                    <div class="p-3 bg-softBlush rounded-xl border border-roseGold/30 flex items-center gap-2 text-xs font-bold text-deepBurgundy">
+                        <i class="fa-solid fa-location-dot text-velvetRose"></i> ${day.location}
+                    </div>
+                    <p class="text-lg font-serif italic text-velvetRose font-semibold">"${day.summary}"</p>
+                    <p class="text-slate-700">${day.details}</p>
+                </div>
+
+                <div class="pt-4 border-t border-roseGold/20 flex justify-end">
+                    <button onclick="closeDayModal()" class="px-6 py-2.5 bg-velvetRose hover:bg-deepBurgundy text-champagne text-xs font-bold uppercase tracking-wider rounded-full transition-colors shadow-md">
+                        Close Details
+                    </button>
+                </div>
+            `;
+
+            const modal = document.getElementById('dayModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDayModal() {
+            const modal = document.getElementById('dayModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function openRandomLoveNote() {
+            const randomNote = loveNotesPool[Math.floor(Math.random() * loveNotesPool.length)];
+            document.getElementById('love-note-text').innerText = randomNote;
+            const modal = document.getElementById('loveNoteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeLoveNoteModal() {
+            const modal = document.getElementById('loveNoteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // --- 9. JOURNAL CONTROLLER ---
+        function updateJournalDisplay() {
+            const entry = journalEntries[currentJournalIndex];
+            document.getElementById('journal-day-title').innerText = entry.day;
+            document.getElementById('journal-photo-label').innerText = entry.title;
+            document.getElementById('journal-moment').innerText = `"${entry.moment}"`;
+            document.getElementById('journal-poem').innerText = entry.poem;
+            document.getElementById('journal-icon').className = `fa-solid ${entry.icon} text-4xl text-roseGold mb-3`;
+            document.getElementById('journal-index').innerText = `${currentJournalIndex + 1} / ${journalEntries.length}`;
+        }
+
+        function nextJournalDay() {
+            currentJournalIndex = (currentJournalIndex + 1) % journalEntries.length;
+            updateJournalDisplay();
+        }
+
+        function prevJournalDay() {
+            currentJournalIndex = (currentJournalIndex - 1 + journalEntries.length) % journalEntries.length;
+            updateJournalDisplay();
+        }
+
+        function editJournalEntryModal() {
+            const entry = journalEntries[currentJournalIndex];
+            document.getElementById('edit-moment-input').value = entry.moment;
+            document.getElementById('edit-poem-input').value = entry.poem.replace(/^“|”$/g, '');
+            
+            const modal = document.getElementById('editJournalModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeEditJournalModal() {
+            const modal = document.getElementById('editJournalModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function saveJournalNote() {
+            const momentVal = document.getElementById('edit-moment-input').value.trim();
+            const poemVal = document.getElementById('edit-poem-input').value.trim();
+
+            if (momentVal) journalEntries[currentJournalIndex].moment = momentVal;
+            if (poemVal) journalEntries[currentJournalIndex].poem = `“${poemVal}”`;
+
+            updateJournalDisplay();
+            closeEditJournalModal();
+        }
+
+        // --- 10. CHECKLIST CONTROLLER ---
+        function renderChecklist() {
+            const container = document.getElementById('checklist-items-container');
+            const modalContainer = document.getElementById('modal-checklist-content');
+            
+            container.innerHTML = '';
+            modalContainer.innerHTML = '';
+
+            checklistItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `p-4.5 rounded-2xl border transition-all flex items-start gap-3.5 ${item.completed ? 'bg-burgundy/30 border-roseGold/20 opacity-70' : 'glass-romantic border-roseGold/30 shadow-candle-glow'}`;
+                div.innerHTML = `
+                    <button onclick="toggleChecklistItem(${item.id})" class="mt-0.5 text-xl text-roseGold focus:outline-none">
+                        <i class="fa-regular ${item.completed ? 'fa-square-check text-roseGold' : 'fa-square text-roseGold/50'}"></i>
+                    </button>
+                    <div>
+                        <h4 class="font-serif font-bold text-lg text-champagne ${item.completed ? 'line-through text-roseGold/60' : ''}">${item.title}</h4>
+                        <p class="text-xs text-champagne/70 mt-1 font-light">${item.desc}</p>
+                    </div>
+                `;
+                container.appendChild(div);
+
+                const modalDiv = div.cloneNode(true);
+                modalDiv.querySelector('button').setAttribute('onclick', `toggleChecklistItem(${item.id})`);
+                modalContainer.appendChild(modalDiv);
+            });
+        }
+
+        function toggleChecklistItem(id) {
+            const item = checklistItems.find(i => i.id === id);
+            if (item) {
+                item.completed = !item.completed;
+                renderChecklist();
+            }
+        }
+
+        function resetChecklist() {
+            checklistItems.forEach(i => i.completed = false);
+            renderChecklist();
+        }
+
+        function toggleChecklistModal() {
+            const modal = document.getElementById('checklistModal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- 11. COUNTDOWN TIMER ---
+        function initCountdown() {
+            const targetDate = new Date('November 5, 2026 00:00:00').getTime();
+
+            function update() {
+                const now = new Date().getTime();
+                const diff = targetDate - now;
+
+                if (diff <= 0) {
+                    document.getElementById('countdown').innerHTML = `<div class="col-span-4 font-serif text-3xl font-bold text-roseGold">Shagufta has arrived in Bangalore! ❤️</div>`;
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('cd-days').innerText = days;
+                document.getElementById('cd-hours').innerText = String(hours).padStart(2, '0');
+                document.getElementById('cd-minutes').innerText = String(minutes).padStart(2, '0');
+                document.getElementById('cd-seconds').innerText = String(seconds).padStart(2, '0');
+            }
+
+            update();
+            setInterval(update, 1000);
+        }
+
+        // INIT ON LOAD
+        window.onload = function() {
+            initParticleCanvas();
+            renderItinerary('all');
+            updateJournalDisplay();
+            renderChecklist();
+            initCountdown();
+        };
+    </script>
+</body>
+</html>
